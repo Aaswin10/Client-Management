@@ -279,3 +279,177 @@ export interface CreateReminderRequest {
   clientId?: number;
   staffId?: number;
 }
+
+// Influencer Management Types
+export enum SocialPlatform {
+  INSTAGRAM = 'INSTAGRAM',
+  FACEBOOK = 'FACEBOOK',
+  YOUTUBE = 'YOUTUBE',
+  TIKTOK = 'TIKTOK',
+  TWITTER = 'TWITTER',
+  LINKEDIN = 'LINKEDIN',
+  SNAPCHAT = 'SNAPCHAT',
+  PINTEREST = 'PINTEREST',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum PaymentMethod {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  CASH = 'CASH',
+  CHEQUE = 'CHEQUE',
+  DIGITAL_WALLET = 'DIGITAL_WALLET',
+  CREDIT_CARD = 'CREDIT_CARD',
+  OTHER = 'OTHER',
+}
+
+export interface SocialHandle {
+  id: number;
+  platform: SocialPlatform;
+  handle: string;
+  url?: string;
+  followers?: number;
+  isVerified: boolean;
+  isPrimary: boolean;
+}
+
+export interface Influencer {
+  id: number;
+  name: string;
+  email: string;
+  contactNumber?: string;
+  address?: string;
+  notes?: string;
+  isActive: boolean;
+  socialHandles: SocialHandle[];
+  collaborations?: Collaboration[];
+  payments?: Payment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInfluencerRequest {
+  name: string;
+  email: string;
+  contactNumber?: string;
+  address?: string;
+  notes?: string;
+  isActive?: boolean;
+  socialHandles?: CreateSocialHandleRequest[];
+}
+
+export interface CreateSocialHandleRequest {
+  platform: SocialPlatform;
+  handle: string;
+  url?: string;
+  followers?: number;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+}
+
+export interface Collaboration {
+  id: number;
+  influencerId: number;
+  campaignName: string;
+  description?: string;
+  deliverables: string;
+  agreedAmountNrs: number;
+  startDate: string;
+  endDate: string;
+  status: string;
+  notes?: string;
+  influencer?: Influencer;
+  payments?: Payment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCollaborationRequest {
+  influencerId: number;
+  campaignName: string;
+  description?: string;
+  deliverables: string;
+  agreedAmountNrs: number;
+  startDate: string;
+  endDate: string;
+  status?: string;
+  notes?: string;
+}
+
+export interface Payment {
+  id: number;
+  influencerId: number;
+  collaborationId?: number;
+  amountNrs: number;
+  status: PaymentStatus;
+  paymentMethod: PaymentMethod;
+  transactionId?: string;
+  paymentDate?: string;
+  dueDate?: string;
+  notes?: string;
+  influencer?: Influencer;
+  collaboration?: Collaboration;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePaymentRequest {
+  influencerId: number;
+  collaborationId?: number;
+  amountNrs: number;
+  status?: PaymentStatus;
+  paymentMethod?: PaymentMethod;
+  transactionId?: string;
+  paymentDate?: string;
+  dueDate?: string;
+  notes?: string;
+}
+
+export interface SearchInfluencersRequest {
+  query?: string;
+  platform?: SocialPlatform;
+  isActive?: boolean;
+}
+
+export interface FilterCollaborationsRequest {
+  campaignName?: string;
+  status?: string;
+  influencerId?: number;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+}
+
+export interface FilterPaymentsRequest {
+  status?: PaymentStatus;
+  paymentMethod?: PaymentMethod;
+  influencerId?: number;
+  collaborationId?: number;
+  minAmount?: number;
+  maxAmount?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface PaymentReportRequest {
+  reportType: string;
+  influencerId?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface InfluencerStats {
+  influencer: Influencer;
+  stats: {
+    totalCollaborations: number;
+    totalEarnings: number;
+    pendingPayments: number;
+    overduePayments: number;
+  };
+}

@@ -241,3 +241,81 @@ export const remindersApi = {
   markAsCompleted: (id: number) => 
     api.patch<ApiResponse<AdminReminder>>(`/reminders/${id}/complete`),
 };
+
+// Influencers API
+export const influencersApi = {
+  getAll: (): Promise<AxiosResponse<ApiResponse<Influencer[]>>> =>
+    api.get('/influencers'),
+  
+  getById: (id: number): Promise<AxiosResponse<ApiResponse<Influencer>>> =>
+    api.get(`/influencers/${id}`),
+  
+  create: (data: CreateInfluencerRequest): Promise<AxiosResponse<ApiResponse<Influencer>>> =>
+    api.post('/influencers', data),
+  
+  update: (id: number, data: Partial<CreateInfluencerRequest>): Promise<AxiosResponse<ApiResponse<Influencer>>> =>
+    api.patch(`/influencers/${id}`, data),
+  
+  delete: (id: number): Promise<AxiosResponse<ApiResponse<Influencer>>> =>
+    api.delete(`/influencers/${id}`),
+  
+  search: (params: SearchInfluencersRequest): Promise<AxiosResponse<ApiResponse<Influencer[]>>> =>
+    api.get('/influencers/search', { params }),
+  
+  getStats: (id: number): Promise<AxiosResponse<ApiResponse<InfluencerStats>>> =>
+    api.get(`/influencers/${id}/stats`),
+};
+
+// Collaborations API
+export const collaborationsApi = {
+  getAll: (): Promise<AxiosResponse<ApiResponse<Collaboration[]>>> =>
+    api.get('/collaborations'),
+  
+  getById: (id: number): Promise<AxiosResponse<ApiResponse<Collaboration>>> =>
+    api.get(`/collaborations/${id}`),
+  
+  create: (data: CreateCollaborationRequest): Promise<AxiosResponse<ApiResponse<Collaboration>>> =>
+    api.post('/collaborations', data),
+  
+  update: (id: number, data: Partial<CreateCollaborationRequest>): Promise<AxiosResponse<ApiResponse<Collaboration>>> =>
+    api.patch(`/collaborations/${id}`, data),
+  
+  delete: (id: number): Promise<AxiosResponse<ApiResponse<Collaboration>>> =>
+    api.delete(`/collaborations/${id}`),
+  
+  filter: (params: FilterCollaborationsRequest): Promise<AxiosResponse<ApiResponse<Collaboration[]>>> =>
+    api.get('/collaborations/filter', { params }),
+  
+  getByInfluencer: (influencerId: number): Promise<AxiosResponse<ApiResponse<Collaboration[]>>> =>
+    api.get(`/collaborations/influencer/${influencerId}`),
+};
+
+// Payments API
+export const paymentsApi = {
+  getAll: (): Promise<AxiosResponse<ApiResponse<Payment[]>>> =>
+    api.get('/payments'),
+  
+  getById: (id: number): Promise<AxiosResponse<ApiResponse<Payment>>> =>
+    api.get(`/payments/${id}`),
+  
+  create: (data: CreatePaymentRequest): Promise<AxiosResponse<ApiResponse<Payment>>> =>
+    api.post('/payments', data),
+  
+  update: (id: number, data: Partial<CreatePaymentRequest>): Promise<AxiosResponse<ApiResponse<Payment>>> =>
+    api.patch(`/payments/${id}`, data),
+  
+  delete: (id: number): Promise<AxiosResponse<ApiResponse<Payment>>> =>
+    api.delete(`/payments/${id}`),
+  
+  filter: (params: FilterPaymentsRequest): Promise<AxiosResponse<ApiResponse<Payment[]>>> =>
+    api.get('/payments/filter', { params }),
+  
+  getOverdue: (): Promise<AxiosResponse<ApiResponse<Payment[]>>> =>
+    api.get('/payments/overdue'),
+  
+  markOverdue: (): Promise<AxiosResponse<ApiResponse<any>>> =>
+    api.post('/payments/mark-overdue'),
+  
+  generateReport: (data: PaymentReportRequest): Promise<AxiosResponse<ApiResponse<any>>> =>
+    api.post('/payments/report', data),
+};

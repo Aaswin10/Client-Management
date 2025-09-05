@@ -14,6 +14,9 @@ import {
   LogOut,
   Menu,
   X,
+  Star,
+  Handshake,
+  CreditCard,
 } from 'lucide-react';
 
 const navigation = [
@@ -25,6 +28,9 @@ const navigation = [
   { name: 'Income', href: '/income', icon: TrendingUp },
   { name: 'Expenses', href: '/expenses', icon: TrendingDown },
   { name: 'Accounts', href: '/accounts', icon: Calculator },
+  { name: 'Influencers', href: '/influencers', icon: Star },
+  { name: 'Collaborations', href: '/collaborations', icon: Handshake },
+  { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Reminders', href: '/reminders', icon: Bell },
 ];
 

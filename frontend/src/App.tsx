@@ -16,6 +16,10 @@ import Reminders from './pages/Reminders';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 import StaffDetailsPage from './pages/StaffDetailsPage';
 import { ClientDetailsPage } from './pages/ClientDetailsPage';
+import { Influencers } from './pages/Influencers';
+import { Collaborations } from './pages/Collaborations';
+import { Payments } from './pages/Payments';
+import { InfluencerDetailsPage } from './pages/InfluencerDetailsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +83,10 @@ function AppRoutes() {
         <Route path="income" element={<Income />} />
         <Route path="expenses" element={<Expenses />} />
         <Route path="accounts" element={<Accounts />} />
+        <Route path="influencers" element={<Influencers />} />
+        <Route path="influencers/:id" element={<InfluencerDetailsPage />} />
+        <Route path="collaborations" element={<Collaborations />} />
+        <Route path="payments" element={<Payments />} />
         <Route path="reminders" element={<Reminders />} />
       </Route>
     </Routes>
