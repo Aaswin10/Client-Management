@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  # Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    env_file:
+      - ./backend/.env
+    environment:
+      POSTGRES_DB: nestjs_system
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - business-network
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "3002:3000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/nestjs_system?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - business-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=https://cback.chronosynclabs.com.np
+    depends_on:
+      - backend
+    networks:
+      - business-network
+
+networks:
+  business-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  node_modules:

@@ -1,0 +1,172 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ClientType {
+  PROSPECT
+  ACTIVE
+  INACTIVE
+}
+
+model Client {
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  email                String
+  phone                String?
+  address              String?
+  contactPerson        String?
+  contractPdfPath      String?    // local file path
+  contractStartDate    DateTime   // actual contract start date
+  contractDurationDays Int        // length in days used for expiry calc
+  type                 ClientType @default(PROSPECT)
+
+  // Accounts
+  lockedAmountNrs  Int @default(0) // how much client is locked for
+  advanceAmountNrs Int @default(0)
+  dueAmountNrs     Int @default(0)
+
+  // Relations
+  incomes    Income[]
+  staffWorks StaffWork[]
+  reminders  AdminReminder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkItem {
+  id         Int      @id @default(autoincrement())
+  title      String   // e.g., "Still Graphic", "Voice Over"
+  rateNrs    Int      // per-unit rate for work-basis payouts
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  staffWorks StaffWork[]
+}
+
+enum StaffType {
+  MONTHLY
+  WORK_BASIS
+}
+
+model Staff {
+  id               Int       @id @default(autoincrement())
+  name             String
+  type             StaffType
+  monthlySalaryNrs Int?      // required for MONTHLY, null for WORK_BASIS
+  isActive         Boolean   @default(true)
+
+  // Relations
+  staffWorks StaffWork[]
+  expenses   Expense[]   // optional: explicit payouts
+  reminders  AdminReminder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Record of work performed to compute payments for WORK_BASIS staff.
+model StaffWork {
+  id          Int      @id @default(autoincrement())
+  staffId     Int
+  workItemId  Int?
+  clientId    Int?
+  quantity    Int?      @default(1)
+  // snapshot rate for audit; default to WorkItem.rateNrs at creation
+  unitRateNrs Int?
+  title       String?
+  description String?
+  performedAt DateTime @default(now())
+
+  staff    Staff     @relation(fields: [staffId], references: [id])
+  workItem WorkItem?  @relation(fields: [workItemId], references: [id])
+  client   Client?   @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Income from clients (manual or auto-suggested from locked/advance)
+model Income {
+  id         Int      @id @default(autoincrement())
+  clientId   Int
+  amountNrs  Int
+  note       String?
+  receivedAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Expenses include staff payouts (both monthly and work-basis) and other expenses
+enum ExpenseSource {
+  STAFF_MONTHLY
+  STAFF_WORK_BASIS
+  GENERAL
+}
+
+model Expense {
+  id        Int           @id @default(autoincrement())
+  staffId   Int?
+  amountNrs Int
+  source    ExpenseSource
+  note      String?
+  paidAt    DateTime      @default(now())
+
+  staff Staff? @relation(fields: [staffId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Reminder types for admin
+enum ReminderType {
+  CONTRACT_EXPIRY
+  STAFF_CONTRACT
+  PAYMENT_DUE
+  GENERAL
+}
+
+enum ReminderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model AdminReminder {
+  id          Int             @id @default(autoincrement())
+  title       String
+  description String?
+  type        ReminderType
+  priority    ReminderPriority @default(MEDIUM)
+  dueDate     DateTime
+  isCompleted Boolean         @default(false)
+  
+  // Optional relations
+  clientId    Int?
+  staffId     Int?
+  
+  client      Client?         @relation(fields: [clientId], references: [id])
+  staff       Staff?          @relation(fields: [staffId], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
