@@ -170,3 +170,107 @@ model AdminReminder {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 }
+
+// Influencer Management Models
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  TIKTOK
+  TWITTER
+  LINKEDIN
+  SNAPCHAT
+  PINTEREST
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CASH
+  CHEQUE
+  DIGITAL_WALLET
+  CREDIT_CARD
+  OTHER
+}
+
+model Influencer {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  contactNumber String?
+  address       String?
+  notes         String?
+  isActive      Boolean  @default(true)
+  
+  // Relations
+  socialHandles  SocialHandle[]
+  collaborations Collaboration[]
+  payments       Payment[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialHandle {
+  id           Int           @id @default(autoincrement())
+  influencerId Int
+  platform     SocialPlatform
+  handle       String        // @username or channel name
+  url          String?       // full URL to profile
+  followers    Int?          // follower count
+  isVerified   Boolean       @default(false)
+  isPrimary    Boolean       @default(false) // primary handle for this platform
+  
+  influencer Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([influencerId, platform, handle])
+}
+
+model Collaboration {
+  id               Int      @id @default(autoincrement())
+  influencerId     Int
+  campaignName     String
+  description      String?
+  deliverables     String   // JSON string or text description
+  agreedAmountNrs  Int      // amount in NPR
+  startDate        DateTime
+  endDate          DateTime
+  status           String   @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  notes            String?
+  
+  // Relations
+  influencer Influencer @relation(fields: [influencerId], references: [id])
+  payments   Payment[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id               Int           @id @default(autoincrement())
+  influencerId     Int
+  collaborationId  Int?          // optional - can be standalone payment
+  amountNrs        Int           // amount in NPR
+  status           PaymentStatus @default(PENDING)
+  paymentMethod    PaymentMethod @default(BANK_TRANSFER)
+  transactionId    String?
+  paymentDate      DateTime?     // when payment was made
+  dueDate          DateTime?     // when payment is due
+  notes            String?
+  
+  // Relations
+  influencer    Influencer     @relation(fields: [influencerId], references: [id])
+  collaboration Collaboration? @relation(fields: [collaborationId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

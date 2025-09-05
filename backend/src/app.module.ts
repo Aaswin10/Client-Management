@@ -11,6 +11,9 @@ import { IncomeModule } from './income/income.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { InfluencersModule } from './influencers/influencers.module';
+import { CollaborationsModule } from './collaborations/collaborations.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { RemindersModule } from './reminders/reminders.module';
     ExpensesModule,
     AccountsModule,
     RemindersModule,
+    InfluencersModule,
+    CollaborationsModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}
